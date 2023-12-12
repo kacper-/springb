@@ -10,11 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class MainLayout extends AppLayout {
 
-    private final transient AuthenticationContext authContext;
-
     public MainLayout(AuthenticationContext authContext) {
-        this.authContext = authContext;
-
         H1 logo = new H1("Vaadin CRM");
         logo.addClassName("logo");
         HorizontalLayout
@@ -22,13 +18,10 @@ public class MainLayout extends AppLayout {
                 authContext.getAuthenticatedUser(UserDetails.class)
                         .map(user -> {
                             Button logout = new Button("Logout", click ->
-                                    this.authContext.logout());
+                                    authContext.logout());
                             Span loggedUser = new Span("Welcome " + user.getUsername());
                             return new HorizontalLayout(logo, loggedUser, logout);
                         }).orElseGet(() -> new HorizontalLayout(logo));
-
-        // Other page components omitted.
-
         addToNavbar(header);
     }
 }
