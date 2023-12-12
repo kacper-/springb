@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 public class Controller {
 
 	@GetMapping("/time")
-	@AnonymousAllowed
 	public String index() {
 		return LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
 	}

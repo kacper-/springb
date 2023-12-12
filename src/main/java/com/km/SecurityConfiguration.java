@@ -16,11 +16,15 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 public class SecurityConfiguration extends VaadinWebSecurity {
 
+    private static final UserDetails[] USERS = {
+            User.withUsername("user").password("{noop}user").roles("USER").build(),
+            User.withUsername("admin").password("{noop}admin").roles("ADMIN").build()
+    };
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(new AntPathRequestMatcher("/public/**"))
-                .permitAll());
-
+        AntPathRequestMatcher matcher = new AntPathRequestMatcher("/public/**");
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(matcher).permitAll());
         super.configure(http);
         setLoginView(http, LoginView.class);
     }
@@ -32,16 +36,6 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Bean
     public UserDetailsManager userDetailsService() {
-        UserDetails user =
-                User.withUsername("user")
-                        .password("{noop}user")
-                        .roles("USER")
-                        .build();
-        UserDetails admin =
-                User.withUsername("admin")
-                        .password("{noop}admin")
-                        .roles("ADMIN")
-                        .build();
-        return new InMemoryUserDetailsManager(user, admin);
+        return new InMemoryUserDetailsManager(USERS);
     }
 }

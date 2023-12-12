@@ -2,6 +2,7 @@ package com.km;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,17 +17,17 @@ public class SecurityService {
     public UserDetails getAuthenticatedUser() {
         SecurityContext context = SecurityContextHolder.getContext();
         Object principal = context.getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
+
+        if (principal instanceof UserDetails)
             return (UserDetails) principal;
-        }
-        return null;
+
+        throw new RuntimeException("Unrecoverable state");
     }
 
     public void logout() {
         UI.getCurrent().getPage().setLocation(LOGOUT_SUCCESS_URL);
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-        logoutHandler.logout(
-                VaadinServletRequest.getCurrent().getHttpServletRequest(), null,
-                null);
+        HttpServletRequest request = VaadinServletRequest.getCurrent().getHttpServletRequest();
+        logoutHandler.logout(request, null, null);
     }
 }
