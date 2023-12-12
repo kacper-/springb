@@ -11,10 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class MainLayout extends AppLayout {
 
     public MainLayout(AuthenticationContext authContext) {
-        H1 logo = new H1("Vaadin CRM");
-        logo.addClassName("logo");
-        HorizontalLayout
-                header =
+        H1 logo = new H1("-TEST-");
+        HorizontalLayout header =
                 authContext.getAuthenticatedUser(UserDetails.class)
                         .map(user -> {
                             Button logout = new Button("Logout", click ->
