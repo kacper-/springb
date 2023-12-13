@@ -1,6 +1,5 @@
-package com.km;
+package com.km.controller;
 
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
