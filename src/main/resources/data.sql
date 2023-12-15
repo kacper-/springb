@@ -1,5 +1,5 @@
-INSERT INTO country (id, name) VALUES (1, 'USA');
-INSERT INTO country (id, name) VALUES (2, 'France');
-INSERT INTO country (id, name) VALUES (3, 'Brazil');
-INSERT INTO country (id, name) VALUES (4, 'Italy');
-INSERT INTO country (id, name) VALUES (5, 'Canada');
+INSERT INTO country (id, name, type) VALUES (1, 'USA', true);
+INSERT INTO country (id, name, type) VALUES (2, 'France', true);
+INSERT INTO country (id, name, type) VALUES (3, 'Brazil', false);
+INSERT INTO country (id, name, type) VALUES (4, 'Italy', false);
+INSERT INTO country (id, name, type) VALUES (5, 'Canada', false);

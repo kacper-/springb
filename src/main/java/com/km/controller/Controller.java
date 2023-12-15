@@ -21,12 +21,7 @@ public class Controller {
 		this.countryRepository = countryRepository;
 	}
 
-	@GetMapping("/time")
-	public String time() {
-		return LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-	}
-
-	@GetMapping("/countries")
+	@GetMapping("/stats")
 	public List<Country> countries() {
 		return countryRepository.findAll();
 	}

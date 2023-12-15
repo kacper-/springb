@@ -24,8 +24,8 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        AntPathRequestMatcher timeMatcher = new AntPathRequestMatcher("/time/**");
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(timeMatcher).anonymous());
+        AntPathRequestMatcher matcher = new AntPathRequestMatcher("/stats/**");
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(matcher).anonymous());
         super.configure(http);
         setLoginView(http, LoginView.class);
     }

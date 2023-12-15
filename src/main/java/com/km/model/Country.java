@@ -14,12 +14,15 @@ public class Country {
 
     private String name;
 
+    private boolean type;
+
     public Country() {
     }
 
-    public Country(Long id, String name) {
+    public Country(Long id, String name, boolean type) {
         this.id = id;
         this.name = name;
+        this.type = type;
     }
 
     public Long getId() {
@@ -28,5 +31,9 @@ public class Country {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isType() {
+        return type;
     }
 }
