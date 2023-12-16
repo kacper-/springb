@@ -15,12 +15,10 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConsumerRunner extends KafkaRunner {
 
     private final KafkaConsumer<String, String> consumer;
-    private final AtomicBoolean running = new AtomicBoolean(false);
 
     public ConsumerRunner(KafkaConfiguration configuration, DBMsgRepository repository) {
         super(configuration, repository);
@@ -42,31 +40,27 @@ public class ConsumerRunner extends KafkaRunner {
 
     @Override
     public void start() {
-        running.set(true);
+        counter.set(0);
+        running = true;
         new Thread(this::consumeMessages).start();
         logger.info("Kafka consumer started");
     }
 
     @Override
     public void stop() {
-        running.set(false);
+        running = false;
         consumer.wakeup();
         logger.info("Kafka consumer stopped");
         logger.info("{} messages consumed", counter);
     }
 
-    @Override
-    public boolean isRunning() {
-        return running.get();
-    }
-
     private void consumeMessages() {
         try {
-            while (running.get()) {
+            while (running) {
                 saveToDB(consumer.poll(Duration.ofMillis(1000)));
             }
         } catch (WakeupException e) {
-            if (running.get())
+            if (running)
                 logger.error("Unexpected Kafka consumer state");
         }
     }

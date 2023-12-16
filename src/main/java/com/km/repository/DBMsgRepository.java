@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface DBMsgRepository extends JpaRepository<DBMsg, Long> {
 
-    List<DBMsg> findByStatus(boolean status);
+    int countByStatus(boolean status);
 
 }

@@ -1,7 +1,6 @@
 package com.km.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.km.KafkaConfiguration;
 import com.km.model.Message;
 import com.km.repository.DBMsgRepository;
@@ -19,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ProducerRunner extends KafkaRunner {
-    private boolean running = false;
     private final KafkaProducer<String, String> producer;
     private final ScheduledExecutorService executor;
 
@@ -40,6 +38,7 @@ public class ProducerRunner extends KafkaRunner {
 
     @Override
     public void start() {
+        counter.set(0);
         running = true;
         executor.scheduleAtFixedRate(this::sendMessage, 0L, 1000L, TimeUnit.MILLISECONDS);
         logger.info("Kafka producer started");
@@ -58,11 +57,6 @@ public class ProducerRunner extends KafkaRunner {
         producer.flush();
         running = false;
         logger.info("{} messages produced", counter);
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
     }
 
     private void sendMessage() {

@@ -1,11 +1,9 @@
 package com.km.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@NamedQuery(name = "DBMsg.countByStatus", query = "select count(*) from DBMsg t where t.status = ?1")
 public class DBMsg {
 
     @Id

@@ -19,7 +19,14 @@ public class Controller {
 	}
 
 	@GetMapping("/stats")
-	public List<DBMsg> countries() {
+	public String stats() {
+		int trueCount = dbMsgRepository.countByStatus(true);
+		int falseCount = dbMsgRepository.countByStatus(false);
+		return String.format("true count = %d<br>false count = %d", trueCount, falseCount);
+	}
+
+	@GetMapping("/all")
+	public List<DBMsg> all() {
 		return dbMsgRepository.findAll();
 	}
 }

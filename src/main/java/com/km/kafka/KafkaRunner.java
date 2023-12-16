@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class KafkaRunner {
+    protected volatile boolean running;
     protected KafkaConfiguration kafkaConfiguration;
     protected DBMsgRepository dbMsgRepository;
     protected ObjectMapper mapper = new ObjectMapper();
@@ -36,5 +37,7 @@ public abstract class KafkaRunner {
         return counter.get();
     }
 
-    public abstract boolean isRunning();
+    public boolean isRunning() {
+        return running;
+    }
 }
