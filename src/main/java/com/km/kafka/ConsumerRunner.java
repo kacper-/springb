@@ -2,7 +2,6 @@ package com.km.kafka;
 
 import com.km.KafkaConfiguration;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.util.Properties;
@@ -25,11 +24,14 @@ public class ConsumerRunner extends KafkaRunner {
     }
 
     @Override
-    public void run() {
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+    public void start() {
 
-        while (running) {
-            // TODO implement
-        }
     }
+
+    @Override
+    public void stop() {
+
+    }
+
+
 }
