@@ -7,15 +7,14 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinServlet;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @Route(value = "", layout = MainLayout.class)
 @PermitAll
 public class MainView extends VerticalLayout {
 
-    @Autowired
-    private KafkaService kafkaService;
     private final Span spanLine1 = new Span();
     private final Span spanLine2 = new Span();
     private final Button produceStart;
@@ -31,10 +30,8 @@ public class MainView extends VerticalLayout {
 
         produceStart = new Button("Produce", this::produceStart);
         produceStop = new Button("Stop", this::produceStop);
-        produceStop.setEnabled(false);
         consumeStart = new Button("Consume", this::consumeStart);
-        consumeStop = new Button("Consume", this::consumeStop);
-        consumeStop.setEnabled(false);
+        consumeStop = new Button("Stop", this::consumeStop);
 
         line1.add(produceStart);
         line1.add(produceStop);
@@ -47,31 +44,45 @@ public class MainView extends VerticalLayout {
         add(line2);
     }
 
+    private void setButtonsState() {
+        produceStart.setEnabled(!getKS().getProducerRunner().isRunning());
+        produceStop.setEnabled(getKS().getProducerRunner().isRunning());
+        consumeStart.setEnabled(!getKS().getConsumerRunner().isRunning());
+        consumeStop.setEnabled(getKS().getConsumerRunner().isRunning());
+    }
+
     private void produceStart(ClickEvent<Button> click) {
-        kafkaService.getProducerRunner().start();
+        getKS().getProducerRunner().start();
         spanLine1.setText("Started");
-        produceStart.setEnabled(false);
-        produceStop.setEnabled(true);
+        setButtonsState();
     }
 
     private void produceStop(ClickEvent<Button> click) {
-        kafkaService.getProducerRunner().stop();
-        spanLine1.setText(String.format("Stopped after %d messages", kafkaService.getProducerRunner().getCounter()));
-        produceStart.setEnabled(true);
-        produceStop.setEnabled(false);
+        getKS().getProducerRunner().stop();
+        spanLine1.setText(String.format("Stopped after %d messages", getKS().getProducerRunner().getCounter()));
+        setButtonsState();
     }
 
     private void consumeStart(ClickEvent<Button> click) {
-        kafkaService.getConsumerRunner().start();
+        getKS().getConsumerRunner().start();
         spanLine2.setText("Started");
-        consumeStart.setEnabled(false);
-        consumeStop.setEnabled(true);
+        setButtonsState();
     }
 
     private void consumeStop(ClickEvent<Button> click) {
-        kafkaService.getConsumerRunner().stop();
-        spanLine2.setText(String.format("Stopped after %d messages", kafkaService.getConsumerRunner().getCounter()));
-        consumeStart.setEnabled(true);
-        consumeStop.setEnabled(false);
+        getKS().getConsumerRunner().stop();
+        spanLine2.setText(String.format("Stopped after %d messages", getKS().getConsumerRunner().getCounter()));
+        setButtonsState();
+    }
+
+    private static <T> T get(Class<T> serviceType)
+    {
+        return WebApplicationContextUtils
+                .getWebApplicationContext(VaadinServlet.getCurrent().getServletContext())
+                .getBean(serviceType);
+    }
+
+    private static KafkaService getKS() {
+        return get(KafkaService.class);
     }
 }

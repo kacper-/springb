@@ -2,7 +2,9 @@ package com.km;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
+@Primary
 @Configuration
 @ConfigurationProperties(prefix = "kafka")
 public class KafkaConfiguration {
