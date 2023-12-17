@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.Properties;
 
 public class ConsumerRunner extends KafkaRunner {
-
+    private static final Duration DURATION = Duration.ofMillis(1000);
     private final KafkaConsumer<String, String> consumer;
 
     public ConsumerRunner(KafkaConfiguration configuration, DBMsgRepository repository) {
@@ -57,7 +57,7 @@ public class ConsumerRunner extends KafkaRunner {
     private void consumeMessages() {
         try {
             while (running) {
-                saveToDB(consumer.poll(Duration.ofMillis(1000)));
+                saveToDB(consumer.poll(DURATION));
             }
         } catch (WakeupException e) {
             if (running)

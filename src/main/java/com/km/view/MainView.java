@@ -12,18 +12,27 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinServlet;
 import jakarta.annotation.security.PermitAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Route(value = "", layout = MainLayout.class)
 @PermitAll
 public class MainView extends VerticalLayout {
+    private static final long PUSH_INTERVAL = 500;
+    private static final long TIMEOUT = 250;
+    private static final Logger logger = LoggerFactory.getLogger(MainView.class);
     private final Span spanLine1 = new Span();
     private final Span spanLine2 = new Span();
     private final Button produceStart;
     private final Button produceStop;
     private final Button consumeStart;
     private final Button consumeStop;
-    private Thread thread;
+    private ScheduledExecutorService executor;
 
     public MainView() {
         HorizontalLayout line1 = new HorizontalLayout();
@@ -45,6 +54,13 @@ public class MainView extends VerticalLayout {
 
         add(line1);
         add(line2);
+    }
+
+    private void setButtonsState() {
+        produceStart.setEnabled(!getKS().getProducerRunner().isRunning());
+        produceStop.setEnabled(getKS().getProducerRunner().isRunning());
+        consumeStart.setEnabled(!getKS().getConsumerRunner().isRunning());
+        consumeStop.setEnabled(getKS().getConsumerRunner().isRunning());
     }
 
     private static <T> T get(Class<T> serviceType) {
@@ -79,49 +95,35 @@ public class MainView extends VerticalLayout {
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-        thread = new Thread(new UpdateThread(attachEvent.getUI(), produceStart, produceStop, consumeStart, consumeStop));
-        thread.start();
+        executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(new Push(attachEvent.getUI()), 0, PUSH_INTERVAL, TimeUnit.MILLISECONDS);
+        logger.info("Backend push started");
     }
 
     @Override
     protected void onDetach(DetachEvent detachEvent) {
-        thread.interrupt();
-        thread = null;
+        executor.shutdown();
+        try {
+            if (executor.awaitTermination(TIMEOUT, TimeUnit.MILLISECONDS))
+                logger.info("Backend push stopped in timely manner");
+            else
+                logger.warn("Backend push stopped forcefully");
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Unrecoverable state", e);
+        }
+        executor = null;
     }
 
-    private static class UpdateThread implements Runnable {
+    private class Push implements Runnable {
         private final UI ui;
-        private final Button produceStart;
-        private final Button produceStop;
-        private final Button consumeStart;
-        private final Button consumeStop;
 
-        public UpdateThread(UI ui, Button produceStart, Button produceStop, Button consumeStart, Button consumeStop) {
+        public Push(UI ui) {
             this.ui = ui;
-            this.produceStart = produceStart;
-            this.produceStop = produceStop;
-            this.consumeStart = consumeStart;
-            this.consumeStop = consumeStop;
-        }
-
-        private void setButtonsState() {
-            produceStart.setEnabled(!getKS().getProducerRunner().isRunning());
-            produceStop.setEnabled(getKS().getProducerRunner().isRunning());
-            consumeStart.setEnabled(!getKS().getConsumerRunner().isRunning());
-            consumeStop.setEnabled(getKS().getConsumerRunner().isRunning());
-            ui.push();
         }
 
         @Override
         public void run() {
-            try {
-                while (true) {
-                    Thread.sleep(500);
-                    ui.access(this::setButtonsState);
-                }
-            } catch (InterruptedException e) {
-                throw new RuntimeException("Unrecoverable state");
-            }
+            ui.access(MainView.this::setButtonsState);
         }
     }
 }

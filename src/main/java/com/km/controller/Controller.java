@@ -3,6 +3,7 @@ package com.km.controller;
 import com.km.model.DBMsg;
 import com.km.repository.DBMsgRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +27,7 @@ public class Controller {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<DBMsg> all() {
         return dbMsgRepository.findAll();
     }

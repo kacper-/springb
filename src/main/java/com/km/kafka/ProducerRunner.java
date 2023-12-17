@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ProducerRunner extends KafkaRunner {
+    private static final long PRODUCE_INTERVAL = 1000;
+    private static final long TIMEOUT = 250;
     private final KafkaProducer<String, String> producer;
     private final ScheduledExecutorService executor;
 
@@ -40,7 +42,7 @@ public class ProducerRunner extends KafkaRunner {
     public void start() {
         counter.set(0);
         running = true;
-        executor.scheduleAtFixedRate(this::sendMessage, 0, 1000, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(this::sendMessage, 0, PRODUCE_INTERVAL, TimeUnit.MILLISECONDS);
         logger.info("Kafka producer started");
     }
 
@@ -49,7 +51,7 @@ public class ProducerRunner extends KafkaRunner {
         running = false;
         executor.shutdown();
         try {
-            if (executor.awaitTermination(250, TimeUnit.MILLISECONDS))
+            if (executor.awaitTermination(TIMEOUT, TimeUnit.MILLISECONDS))
                 logger.info("Kafka producer stopped in timely manner");
             else
                 logger.warn("Kafka producer stopped forcefully");
