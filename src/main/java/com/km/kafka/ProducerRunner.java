@@ -40,14 +40,16 @@ public class ProducerRunner extends KafkaRunner {
     public void start() {
         counter.set(0);
         running = true;
-        executor.scheduleAtFixedRate(this::sendMessage, 0L, 1000L, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(this::sendMessage, 0, 1000, TimeUnit.MILLISECONDS);
         logger.info("Kafka producer started");
     }
 
     @Override
     public void stop() {
+        running = false;
+        executor.shutdown();
         try {
-            if (executor.awaitTermination(500L, TimeUnit.MILLISECONDS))
+            if (executor.awaitTermination(250, TimeUnit.MILLISECONDS))
                 logger.info("Kafka producer stopped in timely manner");
             else
                 logger.warn("Kafka producer stopped forcefully");
@@ -55,7 +57,6 @@ public class ProducerRunner extends KafkaRunner {
             throw new RuntimeException(e);
         }
         producer.flush();
-        running = false;
         logger.info("{} messages produced", counter);
     }
 
