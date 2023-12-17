@@ -16,10 +16,19 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
+/**
+ * Kafka consumer class.
+ * Runs background thread reading messages from kafka and writing it to database
+ */
 public class ConsumerRunner extends KafkaRunner {
     private static final Duration DURATION = Duration.ofMillis(1000);
     private final KafkaConsumer<String, String> consumer;
 
+    /**
+     * Creates object, creates kafka consumer and subscribes to a topic given by configuration
+     * @param configuration kafka configuration
+     * @param repository messages table database repository interface
+     */
     public ConsumerRunner(KafkaConfiguration configuration, DBMsgRepository repository) {
         super(configuration, repository);
         consumer = new KafkaConsumer<>(properties);
@@ -27,12 +36,16 @@ public class ConsumerRunner extends KafkaRunner {
         logger.info("Subscribed to {}", topic);
     }
 
+    /**
+     * Prepares consumer config for kafka client
+     * @return properties object containing all required settings
+     */
     @Override
     protected Properties configure() {
         Properties properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfiguration.getServer());
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonSerializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, kafkaConfiguration.getConsumer());
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         return properties;
@@ -54,6 +67,9 @@ public class ConsumerRunner extends KafkaRunner {
         logger.info("{} messages consumed", counter);
     }
 
+    /**
+     * Consumes messages from queue
+     */
     private void consumeMessages() {
         try {
             while (running) {
@@ -65,6 +81,10 @@ public class ConsumerRunner extends KafkaRunner {
         }
     }
 
+    /**
+     * Deserializes and saves messages to the database
+     * @param records collection of message's kay and value pairs
+     */
     private void saveToDB(ConsumerRecords<String, String> records) {
         if (records == null)
             return;

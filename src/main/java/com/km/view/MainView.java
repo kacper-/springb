@@ -20,6 +20,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Main view of the application
+ *
+ * Allows to start/stop kafka producer and consumer
+ */
 @Route(value = "", layout = MainLayout.class)
 @PermitAll
 public class MainView extends VerticalLayout {
@@ -34,6 +39,9 @@ public class MainView extends VerticalLayout {
     private final Button consumeStop;
     private ScheduledExecutorService executor;
 
+    /**
+     * Defines basic buttons for start/stop operations
+     */
     public MainView() {
         HorizontalLayout line1 = new HorizontalLayout();
         line1.setDefaultVerticalComponentAlignment(Alignment.CENTER);
@@ -93,6 +101,10 @@ public class MainView extends VerticalLayout {
         spanLine2.setText(String.format("Stopped after %d messages", getKS().getConsumerRunner().getCounter()));
     }
 
+    /**
+     * Starts background push thread
+     * @param attachEvent
+     */
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         executor = Executors.newSingleThreadScheduledExecutor();
@@ -100,6 +112,10 @@ public class MainView extends VerticalLayout {
         logger.info("Backend push started");
     }
 
+    /**
+     * Stops background push thread
+     * @param detachEvent
+     */
     @Override
     protected void onDetach(DetachEvent detachEvent) {
         executor.shutdown();
@@ -114,6 +130,9 @@ public class MainView extends VerticalLayout {
         executor = null;
     }
 
+    /**
+     * Background thread for backend push, allowing to update state of producer and consumer buttons
+     */
     private class Push implements Runnable {
         private final UI ui;
 

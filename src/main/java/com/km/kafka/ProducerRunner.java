@@ -16,7 +16,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
+/**
+ * Kafka producer class managing background thread that creates random messages at fixed rate
+ */
 public class ProducerRunner extends KafkaRunner {
     private static final long PRODUCE_INTERVAL = 1000;
     private static final long TIMEOUT = 250;
@@ -62,11 +64,18 @@ public class ProducerRunner extends KafkaRunner {
         logger.info("{} messages produced", counter);
     }
 
+    /**
+     * Sends random message to a kafka queue at configured topic
+     */
     private void sendMessage() {
         producer.send(new ProducerRecord<>(topic, UUID.randomUUID().toString(), createMessage()));
         counter.incrementAndGet();
     }
 
+    /**
+     * Creates random message and serializes it to a json string
+     * @return json string representing message value
+     */
     private String createMessage() {
         Message message = new Message(UUID.randomUUID().toString(), new Random().nextBoolean());
         try {
