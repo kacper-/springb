@@ -66,10 +66,10 @@ public class ConsumerRunner extends KafkaRunner {
     }
 
     private void saveToDB(ConsumerRecords<String, String> records) {
-        if(records == null)
+        if (records == null)
             return;
 
-        for(ConsumerRecord<String, String> record : records) {
+        for (ConsumerRecord<String, String> record : records) {
             try {
                 Message message = mapper.readValue(record.value(), Message.class);
                 dbMsgRepository.save(new DBMsg(null, record.key(), message.getVal(), message.isStatus()));

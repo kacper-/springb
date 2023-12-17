@@ -10,15 +10,14 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class KafkaRunner {
+    protected static final Logger logger = LoggerFactory.getLogger(ProducerRunner.class);
+    protected final Properties properties;
+    protected final String topic;
+    protected final AtomicInteger counter = new AtomicInteger(0);
     protected volatile boolean running;
     protected KafkaConfiguration kafkaConfiguration;
     protected DBMsgRepository dbMsgRepository;
     protected ObjectMapper mapper = new ObjectMapper();
-    protected static final Logger logger = LoggerFactory.getLogger(ProducerRunner.class);
-
-    protected final Properties properties;
-    protected final String topic;
-    protected final AtomicInteger counter = new AtomicInteger(0);
 
     public KafkaRunner(KafkaConfiguration configuration, DBMsgRepository repository) {
         kafkaConfiguration = configuration;

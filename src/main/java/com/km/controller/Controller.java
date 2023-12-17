@@ -11,22 +11,22 @@ import java.util.List;
 @RestController
 public class Controller {
 
-	@Autowired
-	private final DBMsgRepository dbMsgRepository;
+    @Autowired
+    private final DBMsgRepository dbMsgRepository;
 
-	public Controller(DBMsgRepository countryRepository) {
-		this.dbMsgRepository = countryRepository;
-	}
+    public Controller(DBMsgRepository countryRepository) {
+        this.dbMsgRepository = countryRepository;
+    }
 
-	@GetMapping("/stats")
-	public String stats() {
-		int trueCount = dbMsgRepository.countByStatus(true);
-		int falseCount = dbMsgRepository.countByStatus(false);
-		return String.format("true count = %d<br>false count = %d", trueCount, falseCount);
-	}
+    @GetMapping("/stats")
+    public String stats() {
+        int trueCount = dbMsgRepository.countByStatus(true);
+        int falseCount = dbMsgRepository.countByStatus(false);
+        return String.format("true count = %d<br>false count = %d", trueCount, falseCount);
+    }
 
-	@GetMapping("/all")
-	public List<DBMsg> all() {
-		return dbMsgRepository.findAll();
-	}
+    @GetMapping("/all")
+    public List<DBMsg> all() {
+        return dbMsgRepository.findAll();
+    }
 }

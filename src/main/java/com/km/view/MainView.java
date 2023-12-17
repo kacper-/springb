@@ -9,23 +9,21 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinServlet;
-import com.vaadin.flow.shared.communication.PushMode;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @Route(value = "", layout = MainLayout.class)
 @PermitAll
 public class MainView extends VerticalLayout {
-    private Thread thread;
     private final Span spanLine1 = new Span();
     private final Span spanLine2 = new Span();
     private final Button produceStart;
     private final Button produceStop;
     private final Button consumeStart;
     private final Button consumeStop;
+    private Thread thread;
 
     public MainView() {
         HorizontalLayout line1 = new HorizontalLayout();
@@ -49,6 +47,16 @@ public class MainView extends VerticalLayout {
         add(line2);
     }
 
+    private static <T> T get(Class<T> serviceType) {
+        return WebApplicationContextUtils
+                .getWebApplicationContext(VaadinServlet.getCurrent().getServletContext())
+                .getBean(serviceType);
+    }
+
+    private static KafkaService getKS() {
+        return get(KafkaService.class);
+    }
+
     private void produceStart(ClickEvent<Button> click) {
         getKS().getProducerRunner().start();
         spanLine1.setText("Started");
@@ -67,16 +75,6 @@ public class MainView extends VerticalLayout {
     private void consumeStop(ClickEvent<Button> click) {
         getKS().getConsumerRunner().stop();
         spanLine2.setText(String.format("Stopped after %d messages", getKS().getConsumerRunner().getCounter()));
-    }
-
-    private static <T> T get(Class<T> serviceType) {
-        return WebApplicationContextUtils
-                .getWebApplicationContext(VaadinServlet.getCurrent().getServletContext())
-                .getBean(serviceType);
-    }
-
-    private static KafkaService getKS() {
-        return get(KafkaService.class);
     }
 
     @Override
@@ -113,10 +111,11 @@ public class MainView extends VerticalLayout {
             consumeStop.setEnabled(getKS().getConsumerRunner().isRunning());
             ui.push();
         }
+
         @Override
         public void run() {
             try {
-                while(true) {
+                while (true) {
                     Thread.sleep(500);
                     ui.access(this::setButtonsState);
                 }
