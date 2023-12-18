@@ -1,6 +1,7 @@
 package com.km.controller;
 
 import com.km.model.DBMsg;
+import com.km.model.Stats;
 import com.km.repository.DBMsgRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,10 +21,10 @@ public class Controller {
     }
 
     @GetMapping("/stats")
-    public String stats() {
+    public Stats stats() {
         int trueCount = dbMsgRepository.countByStatus(true);
         int falseCount = dbMsgRepository.countByStatus(false);
-        return String.format("true count = %d<br>false count = %d", trueCount, falseCount);
+        return new Stats(trueCount, falseCount);
     }
 
     @GetMapping("/all")
