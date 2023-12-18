@@ -23,12 +23,11 @@ public class ProducerRunner extends KafkaRunner {
     private static final long PRODUCE_INTERVAL = 1000;
     private static final long TIMEOUT = 250;
     private final KafkaProducer<String, String> producer;
-    private final ScheduledExecutorService executor;
+    private ScheduledExecutorService executor;
 
     public ProducerRunner(KafkaConfiguration configuration, DBMsgRepository repository) {
         super(configuration, repository);
         producer = new KafkaProducer<>(properties);
-        executor = Executors.newSingleThreadScheduledExecutor();
     }
 
     @Override
@@ -44,6 +43,7 @@ public class ProducerRunner extends KafkaRunner {
     public void start() {
         counter.set(0);
         running = true;
+        executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleAtFixedRate(this::sendMessage, 0, PRODUCE_INTERVAL, TimeUnit.MILLISECONDS);
         logger.info("Kafka producer started");
     }
